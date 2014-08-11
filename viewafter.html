@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<script type="text/javascript" src="http://fil.nrk.no/contentfile/web/files/nrk.no/distrikt/jQuery/jquery-1.9.1.min.js"></script>
+<!-- Adding TweenMax (or TweenLite+CSSPLugin) and Draggable -->
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/utils/Draggable.min.js"></script>
+
+
+</head>
+
+<style type="text/css">
+
+body, div, p{
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica, sans-serif;
+}
+			
+#before-after{
+	position: relative;
+	width: 100%:;
+	
+	border: 2px solid grey;
+}
+			
+.view{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+
+	overflow: hidden;
+}
+		
+.view-before{
+	  z-index: 100;
+	  width: 100%;
+  }
+				
+.view-after{
+	z-index: 200;
+	width:100%;
+}
+			
+#dragme{
+	position: absolute;
+	width: 10px;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	background-color: black;
+	cursor: pointer;
+	z-index: 300;
+	opacity: 0.5;
+}
+			
+ul{
+	text-align: center;
+}
+			
+ul li{
+	list-style: none;
+	display: inline-block;
+	font-size: 17px;
+	cursor: pointer;
+	margin: 0px 10px 0px 10px
+}
+
+</style>
+
+<script type="text/javascript">
+
+$(function(){
+    
+  var $dragMe = $("#dragme");
+  var $beforeAfter = $("#before-after");
+  var $viewAfter = $(".view-after");
+				
+  Draggable.create($dragMe, {
+	  type:"left",
+	  bounds: $beforeAfter,
+	  onDrag:updateImages
+  });
+			   			    
+  function updateImages(){
+	  TweenLite.set($viewAfter, {width: $dragMe.css("left") });		//or this.x if only dragging
+  }
+			   
+  //Intro Animation
+  animateTo($('.view img').width() >> 1);
+			   
+  //Externall nav
+  $(".to-start").on("click", function(){
+	  animateTo(0);
+  });
+			   
+  $(".to-middle").on("click", function(){
+	  animateTo($('.view img').width() >> 1);  
+  });
+			   
+  $(".to-end").on("click", function(){
+	  animateTo($('.view img').width());
+  });
+			   
+  function animateTo(_left){
+	  TweenLite.to( $dragMe, 0.25, {left: _left, onUpdate: updateImages });
+  }
+  
+  //V2 Click added
+  $beforeAfter.on("click", function(event){			   		
+	  var eventLeft = event.clientX - $beforeAfter.offset().left;
+	  animateTo(eventLeft);
+  });
+    
+				
+});//end jQuery wrapper
+
+$(document).ready(function () {
+
+  var imageratio = 16 / 9;
+  var screenwidth = $(window).width();
+
+ $("#before-after img").css('width', screenwidth);
+ $("#before-after").css('height', screenwidth / imageratio);
+ $("#before-after img").css('height', screenwidth / imageratio);
+
+});
+
+$(window).resize(function() {
+
+  var imageratio = 16 / 9;
+  var screenwidth = $(window).width();
+
+ $("#before-after img").css('width', screenwidth);
+ $("#before-after").css('height', screenwidth / imageratio);
+ $("#before-after img").css('height', screenwidth / imageratio);
+
+ TweenLite.to($("#dragme"), 0, {left: screenwidth >> 1});
+ TweenLite.set($(".view-after"), {width: screenwidth >> 1});	
+
+ });
+
+
+</script>
+
+<body>
+
+<!-- The actual markup -->
+<ul id="controls">
+	<li class="to-start">Før</li>
+	<li class="to-middle">Sammenlign</li>
+	<li class="to-end">Etter</li>
+</ul>
+		
+<div id="before-after">
+	<div class="view view-after"><img src="http://nrk.no/serum/api/imagecrop/1.7654337?cropid=f169w1000"/></div>
+	<div class="view view-before"><img src="http://nrk.no/serum/api/imagecrop/1.7654352?cropid=f169w1000"/></div>
+	<div id="dragme"></div>
+</div>
+
+
+</body>
+</html>
